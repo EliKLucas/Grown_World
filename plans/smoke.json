@@ -1,0 +1,9 @@
+{
+  "description": "Smoke test: every world kind at small R, a few samples each.",
+  "points": [
+    {"world": {"kind": "grown", "gens": 16}, "world_seeds": [0, 1, 2, 3], "R": [3, 4, 5], "samples": 8},
+    {"world": {"kind": "lattice", "d": 2, "L": 50}, "world_seeds": [0], "R": [3, 4], "samples": 6},
+    {"world": {"kind": "lattice", "d": 4, "L": 10}, "world_seeds": [0], "R": [2, 3], "samples": 6},
+    {"world": {"kind": "diluted3d", "L": 24, "keep": 0.6666666666666666}, "world_seeds": [0, 1], "R": [3, 4], "samples": 6}
+  ]
+}
