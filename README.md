@@ -38,6 +38,7 @@ Run everything from inside this folder (the scripts import each other).
 |---|---|
 | `runner.py` | Parallel, resumable, append-only runner for ball-method samples with exact ground states. |
 | `analyze.py` | Per-point tables (samples, timeout rate, mean \|dE\|), weighted and unweighted theta fits with bootstrap errors, sliding windows, per-world splits. |
+| `dimension.py` | Step 1: emergent dimension d(r) out to r = 30 on large grown worlds and lattices (two estimators, saturation checks). Write-up: `reports/step1_dimension.md`. |
 | `worlds.py` | World registry: grown worlds, periodic lattices of any dimension, diluted 3D lattices, rebuilt deterministically from (kind, params, seed). |
 | `import_legacy.py` | Converts the legacy `results/*.npy` to `results/legacy.jsonl`, recovering each sample's world, centre and seed by replaying the legacy seeds. |
 | `exact_milp.py` | Exact ground states via integer programming (scipy/HiGHS), with status, gap and bounds. |
@@ -47,6 +48,11 @@ Run everything from inside this folder (the scripts import each other).
 | `pt.py` | Parallel tempering ground-state solver for any graph. |
 | `stiffness_3d.py` | 3D lattice stiffness exponent with parallel tempering (periodic vs antiperiodic). |
 | `legacy/` | The superseded run scripts (`exact_stiffness.py`, `exact_boost.py`, `analyze_exact.py`). They overwrite their results files; kept for the record only. |
+
+## Reports
+- `reports/step1_dimension.md`: the grown world's dimension rises and levels off at
+  3.00 ± 0.03 over r = 12–29; at the stiffness radii (R = 3–9) it is still 2.7–2.9.
+- `predictions/`: predictions written and committed before the matching data was taken.
 
 ## Results so far
 `python analyze.py --files results/legacy.jsonl` reproduces the legacy tables. Exponents by
