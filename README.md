@@ -40,7 +40,7 @@ Run everything from inside this folder (the scripts import each other).
 | `analyze.py` | Per-point tables (samples, timeout rate, mean \|dE\|), weighted and unweighted theta fits with bootstrap errors, sliding windows, per-world splits. |
 | `calibrate.py` | Steps 2–3: theta over matched windows of R for every world, set against each world's effective dimension over the same radii; figures in `results/calibration/`. Write-up: `reports/step2_calibration.md`. |
 | `dimension.py` | Step 1: emergent dimension d(r) out to r = 30 on large grown worlds and lattices (two estimators, saturation checks). Write-up: `reports/step1_dimension.md`. |
-| `worlds.py` | World registry: grown worlds, periodic lattices of any dimension, diluted 3D lattices, rebuilt deterministically from (kind, params, seed). |
+| `worlds.py` | World registry: grown worlds, degree-preserving rewired grown worlds, periodic lattices of any dimension, diluted 3D lattices, rebuilt deterministically from (kind, params, seed). |
 | `import_legacy.py` | Converts the legacy `results/*.npy` to `results/legacy.jsonl`, recovering each sample's world, centre and seed by replaying the legacy seeds. |
 | `exact_milp.py` | Exact ground states via integer programming (scipy/HiGHS), with status, gap and bounds. |
 | `ballwall.py` | Boundary-free domain-wall method (ball with two clamped caps) that works on any graph. |
@@ -57,6 +57,10 @@ Run everything from inside this folder (the scripts import each other).
   published θ (−0.265 ± 0.039 over R = 3–14); in 3D and 4D it reads high at every reachable
   radius. At matched radii (R ≤ 7) the grown world's θ is what a lattice of its effective
   dimension gives, within about ±0.2.
+- `reports/step4_controls.md`: the diluted lattice's extra θ fades with R (small-size
+  effect); the fully rewired grown world (same degrees, no short loops) is tree-like and not
+  a spin glass at these sizes; a 2%-rewired world, whose effective dimension climbs to 5,
+  has a θ that climbs with it, near the lattice line.
 - `predictions/`: predictions written and committed before the matching data was taken.
 
 ## Results so far

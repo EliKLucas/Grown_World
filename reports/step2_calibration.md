@@ -78,6 +78,13 @@ the 3D lattice in the legacy runs is accounted for by its lower effective dimens
 those radii (about 2.7–2.8, not 3), which is the working hypothesis. The diluted lattice
 sits slightly above the line in every window (0.4–1.1σ each, not significant on its own).
 
+**Update after Step 4** (see `reports/step4_controls.md`): the diluted lattice now has
+data to R = 8, and `calibrate.py` now uses the bootstrap over samples as the primary error
+(the version that also resamples worlds is reported alongside as an upper bound; no grown
+world differs detectably from the others). The table above is as first written. With the
+current data the differences are: grown R 3–6 +0.07 ± 0.13, R 4–7 −0.13 ± 0.20; diluted
+R 3–6 +0.20 ± 0.17, R 4–7 +0.07 ± 0.26. The conclusion is unchanged.
+
 ## What it changes
 
 - **The legacy θ values should not be compared with published exponents.** The method reads

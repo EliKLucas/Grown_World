@@ -10,15 +10,17 @@ relative to the lattices?"
 What it computes
 - theta over each window [R_lo, R_hi]: slope of log mean|dE| against log R, using every
   radius in the window that has data (weighted fit, weights (mean/sem)^2; unweighted too).
-- Errors: bootstrap that resamples worlds (jointly across R, since one world serves every
-  radius), then samples within each (world, R). For the lattices there is one world, so this
-  is the ordinary bootstrap over samples.
+- Errors: bootstrap over samples within each radius (primary). Also reported: a two-stage
+  bootstrap that first resamples worlds (jointly across R; within groups of worlds that
+  cover the same radii), then samples. With few worlds and no real world-to-world
+  differences the two-stage version counts sampling noise twice, so it is an upper bound.
+  (No grown world differs detectably from the others at any R: Kruskal-Wallis p > 0.2.)
 - Effective dimension over the same window: the shell estimator d_S(r) (see dimension.py),
   averaged over r = R_lo..R_hi. Lattices: exact counts. Grown and diluted worlds: measured
   on the very worlds the stiffness samples used, from 300 random centres each.
 
 Data: results/legacy.jsonl and results/stiffness.jsonl (ok records only; the analysis
-refuses to go on if any point used here has timeouts).
+leaves out, with a warning, any point that has unresolved timeouts).
 """
 import json
 import os
@@ -98,13 +100,21 @@ def window_fit(byR, lo, hi, rng):
         return analyze.wls(x, y, wt), np.polyfit(x, y, 1)[0]
 
     w, u = stats(seeds, False)
-    boots = []
+    # Worlds are resampled within strata of worlds that cover the same radii (e.g. seeds
+    # 0-3 cover R = 3-13, seeds 4-7 only R = 10-13), so every radius keeps some data.
+    strata = defaultdict(list)
+    for s_ in seeds:
+        strata[tuple(R in byR and s_ in byR[R] for R in Rs)].append(s_)
+    boots, wboots = [], []
     for _ in range(N_BOOT):
-        pick = rng.choice(len(seeds), len(seeds)) if len(seeds) > 1 else [0]
-        boots.append(stats([seeds[i] for i in pick], True))
+        boots.append(stats(seeds, True))
+        if len(seeds) > 1:
+            pick = [g[i] for g in strata.values() for i in rng.choice(len(g), len(g))]
+            wboots.append(stats(pick, True))
     boots = np.array(boots)
+    w_world = np.array(wboots)[:, 0].std() if wboots else boots[:, 0].std()
     n = sum(len(s) for R in Rs for s in byR[R].values())
-    return Rs, n, w, boots[:, 0].std(), u, boots[:, 1].std()
+    return Rs, n, w, boots[:, 0].std(), u, boots[:, 1].std(), w_world
 
 
 def shells_for(spec, seeds, r_max, rng):
@@ -153,10 +163,12 @@ def main():
         byR = groups.get(fam, {})
         if not byR:
             continue
-        for R in byR:
+        for R in list(byR):
             if bad.get((fam, R)):
-                sys.exit(f"{fam} R={R} has {bad[(fam, R)]} timeout/error records: "
-                         "rerun with a higher --time-limit before calibrating")
+                # A point with unresolved timeouts is biased (the hard samples are the big
+                # balls, which have larger |dE|), so it is left out, loudly.
+                say(f"  EXCLUDED {fam} R={R}: {bad[(fam, R)]} unresolved timeout/error records")
+                del byR[R]
         seeds = sorted({w for R in byR for w in byR[R]}, key=str)
         r_max = max(R for _, R in WINDOWS) + 2
         if spec["kind"] == "diluted3d":
@@ -164,19 +176,19 @@ def main():
         shells = shells_for(spec, seeds, r_max, rng)
         say(f"{label}  [{fam}]  worlds {seeds}")
         say(f"  {'window':>8} {'radii':>5} {'n':>5}  {'theta (weighted)':>17}  "
-            f"{'theta (unweighted)':>19}  {'d_eff':>13}")
+            f"{'theta (unweighted)':>19}  {'d_eff':>13}  {'err incl. worlds':>16}")
         for lo, hi in WINDOWS:
             f = window_fit(byR, lo, hi, rng)
             if f is None:
                 continue
-            Rs, n, w, we, u, ue = f
+            Rs, n, w, we, u, ue, wwe = f
             nR = len(Rs)
             # dimension over the radii actually fitted
             d, de = d_eff(shells, Rs[0], Rs[-1], rng) if Rs[-1] + 1 <= r_max else (np.nan, np.nan)
             say(f"  {lo:>3}-{hi:<4} {nR:>5} {n:>5}  {w:+8.3f} ± {we:5.3f}  "
-                f"{u:+9.3f} ± {ue:5.3f}  {d:6.3f} ± {de:4.3f}")
+                f"{u:+9.3f} ± {ue:5.3f}  {d:6.3f} ± {de:4.3f}  {wwe:16.3f}")
             rows_out.append(dict(label=label, family=fam, lo=lo, hi=hi, radii=nR, n=n,
-                                 theta_w=w, theta_w_err=we, theta_u=u, theta_u_err=ue,
+                                 theta_w=w, theta_w_err=we, theta_u=u, theta_u_err=ue, theta_w_err_worlds=wwe,
                                  d_eff=d, d_eff_err=de))
         say()
 
@@ -218,11 +230,14 @@ def plot(groups, rows):
     fig.savefig(os.path.join(OUT, "dE_vs_R.png"), dpi=150)
 
     # Figure 2: theta against effective dimension, one panel per matched window.
+    # The fully rewired world is left out: its balls are trees, its theta (about 4) is not
+    # a spin-glass exponent, and it would squash the axes. Its numbers are in report.txt.
+    shown = [f for f in FAMILIES if f[1] != "rewired(gens=16,swaps=10)"]
     show = [(2, 4), (3, 6), (4, 7)]
     fig, axes = plt.subplots(1, len(show), figsize=(4.2 * len(show), 4.4), sharey=True)
     for ax, (lo, hi) in zip(axes, show):
         lat = []
-        for label, fam, spec, colour, marker in FAMILIES:
+        for label, fam, spec, colour, marker in shown:
             r = next((r for r in rows if r["family"] == fam and (r["lo"], r["hi"]) == (lo, hi)), None)
             if r is None:
                 continue
@@ -238,13 +253,39 @@ def plot(groups, rows):
         ax.grid(alpha=0.3)
     axes[0].set_ylabel("ball-method θ (weighted fit, ± bootstrap error)")
     from matplotlib.lines import Line2D
-    handles = [Line2D([], [], color=c, marker=m, ls="", ms=7, label=l) for l, _, _, c, m in FAMILIES]
+    handles = [Line2D([], [], color=c, marker=m, ls="", ms=7, label=l) for l, _, _, c, m in shown]
     handles.append(Line2D([], [], color="grey", ls="--", lw=1, label="lattices joined"))
-    fig.legend(handles=handles, loc="lower center", ncol=len(handles), fontsize=8, frameon=False)
+    fig.legend(handles=handles, loc="lower center", ncol=4, fontsize=8, frameon=False)
     fig.suptitle("Ball-method θ against the dimension each world has at the same radii "
                  "(a world appears only where it has data across the window)")
-    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.tight_layout(rect=(0, 0.1, 1, 1))
     fig.savefig(os.path.join(OUT, "theta_vs_d.png"), dpi=150)
+
+    # Figure 3: theta over sliding windows, and effective dimension, against window centre.
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 5))
+    for label, fam, spec, colour, marker in shown:
+        rr = sorted((r for r in rows if r["family"] == fam and r["radii"] >= 3),
+                    key=lambda r: r["lo"])
+        if not rr:
+            continue
+        x = [np.sqrt(r["lo"] * r["hi"]) for r in rr]
+        a1.errorbar(x, [r["theta_w"] for r in rr], yerr=[r["theta_w_err"] for r in rr],
+                    fmt=marker + "-", color=colour, capsize=3, ms=6, label=label)
+        a2.errorbar(x, [r["d_eff"] for r in rr], yerr=[r["d_eff_err"] for r in rr],
+                    fmt=marker + "-", color=colour, capsize=3, ms=6, label=label)
+    for ax in (a1, a2):
+        ax.set_xscale("log")
+        t = [3, 4, 5, 6, 7, 8, 10, 12]
+        ax.set_xticks(t); ax.set_xticklabels(t); ax.minorticks_off()
+        ax.set_xlabel("window centre (geometric mean of its smallest and largest R)")
+        ax.grid(alpha=0.3)
+    a1.set_ylabel("ball-method θ over the window (weighted, ± bootstrap error)")
+    a1.set_title("θ over sliding windows of R (windows of 3 or more radii)")
+    a2.set_ylabel("effective dimension d_S over the same radii")
+    a2.set_title("Effective dimension over the same windows")
+    a1.legend(fontsize=8)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "theta_windows.png"), dpi=150)
 
 
 if __name__ == "__main__":
