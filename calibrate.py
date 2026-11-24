@@ -42,6 +42,10 @@ FAMILIES = [  # label, family name, spec, colour, marker
     ("3D diluted to degree 4", "diluted3d(L=24,keep=0.666667)",
      {"kind": "diluted3d", "L": 24, "keep": 4 / 6}, "#937860", "^"),
     ("grown world", "grown(gens=16)", {"kind": "grown", "gens": 16}, "#c44e52", "o"),
+    ("grown, 2% of edges swapped", "rewired(gens=16,swaps=0.02)",
+     {"kind": "rewired", "gens": 16, "swaps": 0.02}, "#dd8452", "D"),
+    ("grown, fully rewired", "rewired(gens=16,swaps=10)",
+     {"kind": "rewired", "gens": 16, "swaps": 10}, "#8c8c8c", "v"),
 ]
 # Windows [lo, hi]. A world is fitted on a window only if it has data at lo and at hi or
 # hi - 1 (the 2D lattice was run at even radii above 4), and at least 2 radii in between.
