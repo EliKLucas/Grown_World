@@ -38,10 +38,46 @@ def diluted_3d(L, keep, seed):
     return out
 
 
+def rewired(gens, swaps_per_edge, seed):
+    """The grown world (same gens and seed) with its edges randomly rewired, keeping every
+    node's degree: repeated double-edge swaps (a-b, c-d) -> (a-d, c-b), skipping any swap
+    that would create a self-loop or a repeated edge.
+
+    Question it answers (Step 4 control): is it the grown world's geometry (short loops,
+    3D-like growth of balls) that sets its theta, or just its mix of node degrees? Rewiring
+    keeps the degrees and destroys the geometry; the result is a random graph whose balls
+    grow exponentially with R (no finite dimension)."""
+    adj = B.grown_adj(gens, seed=seed)
+    edges = sorted((u, v) for u in adj for v in adj[u] if u < v)
+    present = set(edges)
+    rnd = random.Random(f"rewire-{seed}")
+    target, done, tries = int(swaps_per_edge * len(edges)), 0, 0
+    while done < target and tries < 20 * target:
+        tries += 1
+        i, j = rnd.randrange(len(edges)), rnd.randrange(len(edges))
+        (a, b), (c, d) = edges[i], edges[j]
+        if rnd.random() < 0.5:
+            c, d = d, c
+        if len({a, b, c, d}) < 4:
+            continue
+        e1, e2 = (min(a, d), max(a, d)), (min(c, b), max(c, b))
+        if e1 in present or e2 in present:
+            continue
+        present.difference_update((edges[i], edges[j]))
+        present.update((e1, e2))
+        edges[i], edges[j] = e1, e2
+        done += 1
+    out = {u: [] for u in adj}
+    for u, v in sorted(present):
+        out[u].append(v); out[v].append(u)
+    return out
+
+
 BUILDERS = {
     "grown": lambda p, s: B.grown_adj(p["gens"], seed=s),
     "lattice": lambda p, s: lattice_adj(p["L"], p["d"]),          # seed unused
     "diluted3d": lambda p, s: diluted_3d(p["L"], p["keep"], s),
+    "rewired": lambda p, s: rewired(p["gens"], p["swaps"], s),
 }
 
 

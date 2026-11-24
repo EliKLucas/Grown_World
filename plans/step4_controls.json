@@ -1,0 +1,8 @@
+{
+  "description": "Step 4 controls. (a) diluted 3D lattice extended to R=7-8 (legacy reaches R=6 with 120 samples; 80 more there). (b) grown world with 2% of edge pairs swapped (degrees kept, short loops mostly kept, shortcuts added: effective dimension climbs past 3 by R=4). (c) grown world fully rewired (degrees kept, geometry destroyed: balls are almost trees).",
+  "points": [
+    {"world": {"kind": "diluted3d", "L": 24, "keep": 0.6666666666666666}, "world_seeds": [0, 1], "R": [6, 7, 8], "samples": [80, 150, 100]},
+    {"world": {"kind": "rewired", "gens": 16, "swaps": 0.02}, "world_seeds": [0, 1, 2, 3], "R": [3, 4, 5, 6, 7, 8], "samples": [200, 200, 200, 150, 100, 60]},
+    {"world": {"kind": "rewired", "gens": 16, "swaps": 10}, "world_seeds": [0, 1, 2, 3], "R": [3, 4, 5], "samples": 150}
+  ]
+}
