@@ -1,0 +1,9 @@
+{
+  "description": "Step 2/3 pilot: time the points with no history (lattice calibration radii, grown R=10-11) before planning long runs. Samples count toward the full runs.",
+  "points": [
+    {"world": {"kind": "lattice", "d": 2, "L": 50}, "world_seeds": [0], "R": [10, 12, 14], "samples": 6},
+    {"world": {"kind": "lattice", "d": 3, "L": 24}, "world_seeds": [0], "R": [6, 7], "samples": 6},
+    {"world": {"kind": "lattice", "d": 4, "L": 10}, "world_seeds": [0], "R": [2, 3, 4], "samples": 6},
+    {"world": {"kind": "grown", "gens": 16}, "world_seeds": [0, 1, 2, 3], "R": [10, 11], "samples": 4}
+  ]
+}
