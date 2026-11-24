@@ -34,3 +34,29 @@ can only be solved exactly to R ≈ 6–7, while the grown world can reach R ≈
 same-window comparison may only be possible up to R ≈ 7. Beyond that the comparison has to
 go through the Step 2 calibration (method-θ against dimension), which will itself be
 extrapolated.
+
+## Addendum (2026-11-24, while Step 3 was running; before its analysis)
+
+Written after Step 2 finished, with Step 3 partly done. What I had seen of Step 3 data at
+this point: only a provisional R = 7–10 grown window (+1.1 ± 0.7, a handful of R = 10
+samples) that appeared in a calibration test run. Nothing at R = 11–13.
+
+1. **Expected precision.** At R ≤ 8 the grown world's |ΔE| has a standard deviation about
+   equal to its mean, so log mean|ΔE| at a point with n samples has an error of about 1/√n.
+   With the planned counts (R = 9–13: about 100, 100, 80, 48, 40) the weighted θ over
+   R = 9–13 will carry an error of about ±0.45 before world-to-world spread, and
+   three-radius windows at large R ±0.7–1.2. That cannot separate 0.24 (the published 3D
+   value) from 0.5 (what the ball method gives for 3D at R ≤ 7). So the "inconclusive"
+   outcome is likely on statistics alone, whatever the physics. Halving the R = 9–13 error
+   would need about 4× the samples there (roughly 12 more hours on this machine).
+2. **"θ rises with R" is not a clean signature.** Step 2 shows the ball method's θ for the
+   2D lattice *falls* with R at fixed dimension (about 0 at R = 3–6, about −0.4 at
+   R = 10–14). If the same small-size bias acts on the grown world, a falling bias and a
+   rising dimension pull in opposite directions. The comparison that controls for this is
+   the grown world's θ against the lattice line at the same window and effective dimension
+   (Step 2's figure), which only exists up to R = 7. Beyond R = 7 there is no 3D-lattice
+   comparison at all.
+3. **Test committed now for large R.** Over R = 9–13 the grown θ is "consistent with 3D"
+   if it lies within 2 errors of the range 0.24–0.5 (the published value to the ball
+   method's small-R 3D reading). It counts against universality only if it is more than
+   2 errors outside that range.
