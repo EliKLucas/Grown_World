@@ -53,6 +53,9 @@ FAMILIES = [  # label, family name, spec, colour, marker
 # hi - 1 (the 2D lattice was run at even radii above 4), and at least 2 radii in between.
 WINDOWS = [(2, 4), (3, 4), (3, 6), (4, 7), (5, 7), (6, 9), (7, 10), (8, 11), (9, 12),
            (10, 13), (10, 14)]
+# Wide windows, reported but not plotted as sliding windows. (9, 13) is the window of the
+# large-R test committed in predictions/step3_universality.md before the Step 3 analysis.
+WIDE_WINDOWS = [(3, 13), (5, 13), (9, 13)]
 MIN_SAMPLES = 10
 N_BOOT = 2000
 N_CENTRES = 300
@@ -177,7 +180,7 @@ def main():
         say(f"{label}  [{fam}]  worlds {seeds}")
         say(f"  {'window':>8} {'radii':>5} {'n':>5}  {'theta (weighted)':>17}  "
             f"{'theta (unweighted)':>19}  {'d_eff':>13}  {'err incl. worlds':>16}")
-        for lo, hi in WINDOWS:
+        for lo, hi in WINDOWS + WIDE_WINDOWS:
             f = window_fit(byR, lo, hi, rng)
             if f is None:
                 continue
@@ -188,6 +191,7 @@ def main():
             say(f"  {lo:>3}-{hi:<4} {nR:>5} {n:>5}  {w:+8.3f} ± {we:5.3f}  "
                 f"{u:+9.3f} ± {ue:5.3f}  {d:6.3f} ± {de:4.3f}  {wwe:16.3f}")
             rows_out.append(dict(label=label, family=fam, lo=lo, hi=hi, radii=nR, n=n,
+                                 wide=(lo, hi) in WIDE_WINDOWS,
                                  theta_w=w, theta_w_err=we, theta_u=u, theta_u_err=ue, theta_w_err_worlds=wwe,
                                  d_eff=d, d_eff_err=de))
         say()
@@ -264,7 +268,8 @@ def plot(groups, rows):
     # Figure 3: theta over sliding windows, and effective dimension, against window centre.
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 5))
     for label, fam, spec, colour, marker in shown:
-        rr = sorted((r for r in rows if r["family"] == fam and r["radii"] >= 3),
+        rr = sorted((r for r in rows if r["family"] == fam and r["radii"] >= 3
+                     and not r["wide"]),
                     key=lambda r: r["lo"])
         if not rr:
             continue

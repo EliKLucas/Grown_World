@@ -38,7 +38,7 @@ Run everything from inside this folder (the scripts import each other).
 |---|---|
 | `runner.py` | Parallel, resumable, append-only runner for ball-method samples with exact ground states. |
 | `analyze.py` | Per-point tables (samples, timeout rate, mean \|dE\|), weighted and unweighted theta fits with bootstrap errors, sliding windows, per-world splits. |
-| `calibrate.py` | Steps 2–3: theta over matched windows of R for every world, set against each world's effective dimension over the same radii; figures in `results/calibration/`. Write-up: `reports/step2_calibration.md`. |
+| `calibrate.py` | Steps 2–4: theta over matched windows of R for every world, set against each world's effective dimension over the same radii; figures in `results/calibration/`. Write-ups: `reports/step2_calibration.md`, `reports/step3_grown_theta.md`, `reports/step4_controls.md`. |
 | `dimension.py` | Step 1: emergent dimension d(r) out to r = 30 on large grown worlds and lattices (two estimators, saturation checks). Write-up: `reports/step1_dimension.md`. |
 | `worlds.py` | World registry: grown worlds, degree-preserving rewired grown worlds, periodic lattices of any dimension, diluted 3D lattices, rebuilt deterministically from (kind, params, seed). |
 | `import_legacy.py` | Converts the legacy `results/*.npy` to `results/legacy.jsonl`, recovering each sample's world, centre and seed by replaying the legacy seeds. |
@@ -57,6 +57,10 @@ Run everything from inside this folder (the scripts import each other).
   published θ (−0.265 ± 0.039 over R = 3–14); in 3D and 4D it reads high at every reachable
   radius. At matched radii (R ≤ 7) the grown world's θ is what a lattice of its effective
   dimension gives, within about ±0.2.
+- `reports/step3_grown_theta.md`: the grown world's θ out to R = 13 (all samples solved
+  exactly). Over R = 9–13 it is −0.55 ± 0.47: within the committed "consistent with 3D"
+  test, but equally consistent with 2D, so inconclusive. Deciding it needs about 13× the
+  samples.
 - `reports/step4_controls.md`: the diluted lattice's extra θ fades with R (small-size
   effect); the fully rewired grown world (same degrees, no short loops) is tree-like and not
   a spin glass at these sizes; a 2%-rewired world, whose effective dimension climbs to 5,
