@@ -1,0 +1,8 @@
+{
+  "description": "Step 2: calibrate ball-method theta against lattice dimension (2D to R=14, 3D to R=7, 4D to R=4). Legacy data covers 2D R<=8 and 3D R<=5; this tops every point up to the sample targets.",
+  "points": [
+    {"world": {"kind": "lattice", "d": 2, "L": 50}, "world_seeds": [0], "R": [10, 12, 14], "samples": [150, 100, 100]},
+    {"world": {"kind": "lattice", "d": 3, "L": 24}, "world_seeds": [0], "R": [5, 6, 7], "samples": [110, 100, 40]},
+    {"world": {"kind": "lattice", "d": 4, "L": 10}, "world_seeds": [0], "R": [2, 3, 4], "samples": [300, 300, 150]}
+  ]
+}

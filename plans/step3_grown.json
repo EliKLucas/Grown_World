@@ -1,0 +1,7 @@
+{
+  "description": "Step 3: grown-world theta to R=13. R=9 topped up toward 100 (legacy has 41); new radii use 8 worlds (seeds 0-7) to sample world-to-world variation.",
+  "points": [
+    {"world": {"kind": "grown", "gens": 16}, "world_seeds": [0, 1, 2, 3], "R": [9], "samples": 60},
+    {"world": {"kind": "grown", "gens": 16}, "world_seeds": [0, 1, 2, 3, 4, 5, 6, 7], "R": [10, 11, 12, 13], "samples": [100, 80, 48, 40]}
+  ]
+}
