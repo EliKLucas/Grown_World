@@ -38,6 +38,7 @@ Run everything from inside this folder (the scripts import each other).
 |---|---|
 | `runner.py` | Parallel, resumable, append-only runner for ball-method samples with exact ground states. |
 | `analyze.py` | Per-point tables (samples, timeout rate, mean \|dE\|), weighted and unweighted theta fits with bootstrap errors, sliding windows, per-world splits. |
+| `calibrate.py` | Steps 2–3: theta over matched windows of R for every world, set against each world's effective dimension over the same radii; figures in `results/calibration/`. Write-up: `reports/step2_calibration.md`. |
 | `dimension.py` | Step 1: emergent dimension d(r) out to r = 30 on large grown worlds and lattices (two estimators, saturation checks). Write-up: `reports/step1_dimension.md`. |
 | `worlds.py` | World registry: grown worlds, periodic lattices of any dimension, diluted 3D lattices, rebuilt deterministically from (kind, params, seed). |
 | `import_legacy.py` | Converts the legacy `results/*.npy` to `results/legacy.jsonl`, recovering each sample's world, centre and seed by replaying the legacy seeds. |
@@ -52,10 +53,16 @@ Run everything from inside this folder (the scripts import each other).
 ## Reports
 - `reports/step1_dimension.md`: the grown world's dimension rises and levels off at
   3.00 ± 0.03 over r = 12–29; at the stiffness radii (R = 3–9) it is still 2.7–2.9.
+- `reports/step2_calibration.md`: on the 2D lattice the ball method converges to the
+  published θ (−0.265 ± 0.039 over R = 3–14); in 3D and 4D it reads high at every reachable
+  radius. At matched radii (R ≤ 7) the grown world's θ is what a lattice of its effective
+  dimension gives, within about ±0.2.
 - `predictions/`: predictions written and committed before the matching data was taken.
 
 ## Results so far
 `python analyze.py --files results/legacy.jsonl` reproduces the legacy tables. Exponents by
 the ball method (weighted fits): 2D lattice -0.17 ± 0.07, grown world +0.26 ± 0.07, 3D
 lattice +0.52 ± 0.18, 3D lattice diluted to degree 4 +0.65 ± 0.12. The ball method reads
-high at small sizes, so compare worlds with each other rather than with published values.
+high at small sizes (Step 2: the 3D lattice gives +0.43 over R = 2–7 against a published
+value of about 0.24), so compare worlds with each other at the same radii, not with
+published values.
